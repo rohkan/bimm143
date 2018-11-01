@@ -1,0 +1,18 @@
+---
+title: "class08_PCA"
+author: "Andy Kao"
+date: "October 25, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+#import dataset
+```{r}
+x <- read.csv("UK_foods.csv")
+dim(x)
+head(x)
+#fix first column so that they are names
+```
+

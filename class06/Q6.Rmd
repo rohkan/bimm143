@@ -1,0 +1,40 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+ 
+
+```{r}
+#This function accepts a single character input(meant to be a pdb ID) and outputs a plot displaying the bfactor(flexibility) at each residue of the given protein structure
+import_trim <- function(pdbID)
+{
+  
+  #if statement to check if the input is a character, I would also add a check for whether or not the input is PDB ID if I knew a function for checking that
+  if(!is.character(pdbID))
+  {
+    stop("Please Input a character value")
+  }
+  
+  #imports the bio3d package which contains the pdb databse, will only run if the package is not already installed
+  library(bio3d)
+  
+  #assigns the input to a local protein object and assigns the chain (A) and atom(b) of interest to other local objects
+  protein <- read.pdb(pdbID)
+  protein.chainA <- trim.pdb(protein, chain="A", elety="CA")
+  protein.b <- protein.chainA$atom$b
+  
+  #outputs a plot displaying the bfactor(flexibility) at each residue of the given protein structure
+  return(plotb3( protein.b, sse=protein.chainA, typ="l", ylab="Bfactor" ))
+
+}
+
+#testing with the 3 inputs used in the example code
+import_trim("4AKE") # kinase with drug
+import_trim("1AKE") # kinase no drug
+import_trim("1E4Y") # kinase with drug
+
+#further improvements could include an additional function for importing and trimming multiple proteins at once and outputing an overlayed plot or the addition of additional arguments to create an even more general function capable of outputting multiple kinds of plots
+```
+
+

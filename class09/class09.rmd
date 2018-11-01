@@ -1,0 +1,101 @@
+---
+title: "class09"
+author: "Andy Kao"
+date: "October 30, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+data setup
+```{r}
+# Complete the following code to input the data and store as wisc.df
+url <- "https://bioboot.github.io/bimm143_W18/class-material/WisconsinCancer.csv"
+wisc.df <- read.csv(url)
+#viewing data 
+table(wisc.df$diagnosis)
+#storing data in matrix
+wisc.data <- as.matrix(wisc.df[,3:32])
+# assign ID as row name to matrix
+rownames(wisc.data) <- wisc.df$id
+# setup diagnosis logical vector
+diagnosis <- as.numeric(wisc.df$diagnosis=="M")
+#to findnumber of means in column names
+x <- length(grep("_mean",colnames(wisc.df)))
+```
+there are `r x` mean measurements in the dataset
+
+pca
+```{r}
+#check for scaling
+colMeans(wisc.data)
+apply(wisc.data, 2, sd)
+wisc.pr <- prcomp(wisc.data, scale=T)
+summary(wisc.pr)
+```
+pca visualization
+```{r}
+biplot(wisc.pr)
+#color by diagnosis for pc1 and pc2 in normal scatterplot
+plot(wisc.pr$x[,1], wisc.pr$x[,2], col=diagnosis+1, xlab = "PC1", ylab = "PC2")
+#pc1 vs [pc3]
+plot(wisc.pr$x[,1], wisc.pr$x[,3], col=diagnosis+1, xlab = "PC1", ylab = "PC3")
+```
+looking at variance with scree plots
+```{r}
+pr.var <- wisc.pr$sdev^2
+pve <- pr.var/sum(pr.var)
+plot(pve, xlab = "Principal Component", ylab="Proportion of Variance Explained", 
+ylim = c(0, 1), type = "o")
+# Alternative scree plot of the same data, note data driven y-axis
+barplot(pve, ylab = "Precent of Variance Explained",
+     names.arg=paste0("PC",1:length(pve)), las=2, axes = FALSE)
+axis(2, at=pve, labels=round(pve,2)*100 )
+#graph of cumulative variance
+plot( cumsum(pve) , xlab = "Principal Component", 
+     ylab = "Cumulative Proportion of Variance Explained", 
+     ylim = c(0, 1), type = "o")
+#side by side graphs
+par(mfrow=c(1,2))
+plot(pve, xlab = "Principal Component", ylab="Proportion of Variance Explained", 
+ylim = c(0, 1), type = "o")
+plot( cumsum(pve) , xlab = "Principal Component", 
+     ylab = "Cumulative Proportion of Variance Explained", 
+     ylim = c(0, 1), type = "o")
+```
+hierarchical clustering
+```{r}
+data.scaled <- scale(wisc.data)
+data.dist <-dist(wisc.data)
+wisc.hclust <- hclust(data.dist, method="complete")
+plot(wisc.hclust)
+#trimming tree to get 4 clusters
+wisc.hclust.clusters <- cutree(wisc.hclust, k=4)
+plot(wisc.hclust.clusters)
+table(wisc.hclust.clusters)
+table(wisc.hclust.clusters, diagnosis)
+```
+pca clustering
+```{r}
+#amount for 90% variance
+d.pr <- dist(wisc.pr$x[,1:7])
+wisc.pr.hclust <- hclust(d.pr, method="complete")
+plot(wisc.pr.hclust)
+#trim
+wisc.pr.hclust<- cutree(wisc.pr.hclust, k=4)
+table(wisc.pr.hclust)
+table(wisc.pr.hclust, diagnosis)
+```
+looking at new data
+```{r}
+url <- 
+"https://tinyurl.com/new-samples-CSV"
+new <- read.csv(url)
+npc <- predict(wisc.pr, newdata=new)
+plot(wisc.pr$x[,1:2], col=diagnosis+1)
+points(npc[,1], npc[,2], col="blue", pch=16)
+```
+
+
