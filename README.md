@@ -1,2 +1,2 @@
 # bimm143
-class repo for bimm 143 at UCSD
+class repository for bimm-143(intro to bioinformatics  labs) at UCSD
