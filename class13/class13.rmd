@@ -1,0 +1,33 @@
+---
+title: "class13"
+author: "Andy Kao"
+date: "November 13, 2018"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+import and split HIV protease into protein and ligand
+will use trim.pdb() to split
+```{r}
+library(bio3d)
+file.name <- get.pdb("1hsg")
+hiv <- read.pdb(file.name)
+```
+protein
+```{r}
+prot <- trim.pdb(hiv, "protein")
+prot
+write.pdb(prot, file="1hsg_protein.pdb")
+```
+ligand
+```{r}
+lig <- trim.pdb(hiv, "ligand")
+lig
+write.pdb(lig, "1hsg_ligand.pdb")
+```
+
+
